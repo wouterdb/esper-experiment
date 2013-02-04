@@ -1,0 +1,3 @@
+#convert between collectdmetric and metric  
+
+insert into metric select a.time as time, a.host as host, a.plugin as plugin,a.pluginI as pluginI, a.type as type, a.typeI as typeI, a.values[0] as value from collectdmetric as a

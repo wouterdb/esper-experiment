@@ -1,0 +1,10 @@
+//make load alert
+insert into alert select m.host as host, m.value as value, m.type as type, level, m.time as time from metric as m, method:Alerts.rankLow(m.value,0.3,0.5) as level where m.type='load';
+
+
+
+//Flap detection
+//find changes
+insert into changes select a.host as host, a.type as type, a.time as time, prev(a,1).level as oldLevel , a.level as newLevel, prev(a,1).level != a.level as change from alert.win:length_batch(2) as a  group by a.host,a.type;
+//insert into flaps when too many changes
+insert into flaps select x.host as host ,x.type as type , count(x.change) as changeCount from changes.win:length(15) as x where x.change group by x.host, x.type having  count(x.change)> 3;

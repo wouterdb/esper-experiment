@@ -1,0 +1,24 @@
+
+create dataflow MetricsIn
+  AMQPSource -> metrics<metric> {
+    host: 'verdana',
+    exchange: 'metrics',
+    username: 'guest',
+    password: 'guest',
+    routingKey: '#',
+    collector: {class: 'dnet.monitor.cep.AMQPJsonToMetric'},
+    logMessages: true
+  }
+  EventBusSink(metrics){};
+  
+create dataflow MetricsOut
+  EventBusSource -> alerts<alert> {}
+  AMQPSink(alerts) {
+    host: 'verdana',
+    exchange: 'alerts',
+    username: 'guest',
+    password: 'guest',
+    queuename: 'alerts',
+    collector: {class: 'dnet.monitor.cep.AlertToAMQP'},
+    logMessages: true
+  };
